@@ -5,9 +5,24 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
 import { randomBytes, scryptSync } from 'crypto';
 
-const dbUrl = process.env.DATABASE_URL || 'file:./prisma/dev.db';
-const adapter = new PrismaLibSql({ url: dbUrl });
-const prisma = new PrismaClient({ adapter });
+const dbUrl = process.env.DATABASE_URL ?? process.env.POSTGRES_PRISMA_URL ?? process.env.POSTGRES_URL ?? '';
+const isPostgres = dbUrl.startsWith('postgres') || dbUrl.startsWith('postgresql') || dbUrl.includes('neon.tech');
+
+let prisma;
+
+if (isPostgres) {
+  console.log('📡 Seeding en mode PostgreSQL (Neon)...');
+  const { neon } = await import('@neondatabase/serverless');
+  const { PrismaNeon } = await import('@prisma/adapter-neon');
+  const sql = neon(process.env.POSTGRES_URL ?? dbUrl);
+  const adapter = new PrismaNeon(sql);
+  prisma = new PrismaClient({ adapter });
+} else {
+  console.log('💻 Seeding en mode SQLite (libsql)...');
+  const cleanUrl = dbUrl.startsWith('file:') ? dbUrl : 'file:./prisma/dev.db';
+  const adapter = new PrismaLibSql({ url: cleanUrl });
+  prisma = new PrismaClient({ adapter });
+}
 
 
 function hashPassword(password) {
