@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "node prisma/prepare-db.mjs && prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate",
+    "postinstall": "node prisma/prepare-db.mjs && prisma generate",
     "seed": "npx ts-node --project tsconfig.json -e 'require(\"./prisma/seed.ts\")';",
-    "db:push": "prisma db push",
+    "db:push": "node prisma/prepare-db.mjs && prisma db push",
     "db:seed": "node prisma/seed.mjs"
   },
   "dependencies": {

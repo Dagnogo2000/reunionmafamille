@@ -10,20 +10,9 @@ Ce guide explique comment déployer l'application MaFamille sur Vercel en produc
 
 ## Étape 1 : Préparer le code pour la production
 
-Avant de pousser sur GitHub, basculer le schéma Prisma en mode PostgreSQL :
+**Bonne nouvelle !** Grâce au script d'automatisation que j'ai configuré, vous n'avez **absolument rien à changer manuellement** dans votre code ou vos fichiers de configuration. 
 
-Dans le fichier `prisma/schema.prisma`, remplacer :
-```prisma
-datasource db {
-  provider = "sqlite"
-}
-```
-par :
-```prisma
-datasource db {
-  provider = "postgresql"
-}
-```
+Le projet détectera automatiquement s'il s'exécute en local (SQLite) ou sur Vercel (PostgreSQL) et adaptera le schéma Prisma de manière totalement transparente.
 
 ---
 
