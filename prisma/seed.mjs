@@ -5,6 +5,14 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
 import { randomBytes, scryptSync } from 'crypto';
 
+const cleanNeonUrl = (url) => {
+  if (!url) return '';
+  let cleaned = url.trim();
+  cleaned = cleaned.replace('-pooler.', '.');
+  cleaned = cleaned.replace(/[\?&]channel_binding=\w+/g, '');
+  return cleaned;
+};
+
 const cleanString = (val) => {
   if (!val || val === 'undefined' || val === 'null') return '';
   return val.trim();
@@ -25,7 +33,7 @@ if (isPostgres) {
   const { PrismaNeon } = await import('@prisma/adapter-neon');
   const pgUrl = cleanString(process.env.POSTGRES_URL_NON_POOLING) || 
                 cleanString(process.env.POSTGRES_URL) || dbUrl;
-  const sql = neon(pgUrl);
+  const sql = neon(cleanNeonUrl(pgUrl));
   const adapter = new PrismaNeon(sql);
   prisma = new PrismaClient({ adapter });
 } else {

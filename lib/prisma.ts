@@ -16,7 +16,15 @@ function getPrisma(): PrismaClient {
   
   let _client: PrismaClient;
 
-  const cleanString = (val) => {
+  const cleanNeonUrl = (url: string) => {
+    if (!url) return '';
+    let cleaned = url.trim();
+    cleaned = cleaned.replace('-pooler.', '.');
+    cleaned = cleaned.replace(/[\?&]channel_binding=\w+/g, '');
+    return cleaned;
+  };
+
+  const cleanString = (val: any) => {
     if (!val || val === 'undefined' || val === 'null') return '';
     return val.trim();
   };
@@ -35,7 +43,7 @@ function getPrisma(): PrismaClient {
     const { PrismaNeon } = require('@prisma/adapter-neon');
     const pgUrl = cleanString(process.env.POSTGRES_URL_NON_POOLING) || 
                   cleanString(process.env.POSTGRES_URL) || dbUrl;
-    const sql = neon(pgUrl);
+    const sql = neon(cleanNeonUrl(pgUrl));
     const adapter = new PrismaNeon(sql as any);
     _client = new PrismaClient({ adapter } as any);
   } else {
