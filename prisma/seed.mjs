@@ -3,7 +3,7 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
-import { createHash } from 'crypto';
+import { randomBytes, scryptSync } from 'crypto';
 
 const dbUrl = process.env.DATABASE_URL || 'file:./prisma/dev.db';
 const adapter = new PrismaLibSql({ url: dbUrl });
@@ -11,7 +11,9 @@ const prisma = new PrismaClient({ adapter });
 
 
 function hashPassword(password) {
-  return createHash('sha256').update(password).digest('hex');
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
 }
 
 async function main() {
@@ -20,7 +22,12 @@ async function main() {
   // Vérifier si l'admin existe déjà
   const existing = await prisma.user.findFirst({ where: { email: 'admin@mafamille.com' } });
   if (existing) {
-    console.log('ℹ️  Admin déjà présent, seed ignoré.');
+    console.log('ℹ️  Admin existant détecté, mise à jour du mot de passe...');
+    await prisma.user.update({
+      where: { id: existing.id },
+      data: { password: hashPassword('admin123') }
+    });
+    console.log('✅ Mot de passe admin mis à jour avec le bon hash scrypt !');
     return;
   }
 
