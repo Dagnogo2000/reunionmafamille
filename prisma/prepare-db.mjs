@@ -10,7 +10,7 @@ if (!fs.existsSync(schemaPath)) {
 
 let schema = fs.readFileSync(schemaPath, 'utf8');
 
-const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL || '';
+const dbUrl = process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || process.env.DATABASE_URL || '';
 const isPostgres = dbUrl.startsWith('postgres') || dbUrl.startsWith('postgresql') || dbUrl.includes('neon.tech');
 
 if (isPostgres) {
