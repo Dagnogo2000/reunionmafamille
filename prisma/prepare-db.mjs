@@ -16,6 +16,11 @@ const isPostgres = dbUrl.startsWith('postgres') || dbUrl.startsWith('postgresql'
 if (isPostgres) {
   console.log('📡 [Prisma Config] Détection de PostgreSQL (Vercel Production)...');
   schema = schema.replace(/provider\s*=\s*"sqlite"/g, 'provider = "postgresql"');
+  
+  // Écrire DATABASE_URL dans le fichier .env pour que Prisma CLI la trouve
+  const pgUrl = process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || dbUrl;
+  fs.writeFileSync(path.join(process.cwd(), '.env'), `DATABASE_URL="${pgUrl}"\n`, 'utf8');
+  console.log('📝 Fichier .env généré pour Prisma en production.');
 } else {
   console.log('💻 [Prisma Config] Détection de SQLite (Local Dev)...');
   schema = schema.replace(/provider\s*=\s*"postgresql"/g, 'provider = "sqlite"');
