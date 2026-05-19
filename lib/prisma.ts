@@ -39,12 +39,12 @@ function getPrisma(): PrismaClient {
   if (isPostgres) {
     // ── Mode Production : Neon PostgreSQL ──
     console.log('📡 [Prisma Client] Initialisation en mode PostgreSQL (Neon)...');
-    const { neon } = require('@neondatabase/serverless');
+    const { Pool } = require('@neondatabase/serverless');
     const { PrismaNeon } = require('@prisma/adapter-neon');
     const pgUrl = cleanString(process.env.POSTGRES_URL_NON_POOLING) || 
                   cleanString(process.env.POSTGRES_URL) || dbUrl;
-    const sql = neon(cleanNeonUrl(pgUrl));
-    const adapter = new PrismaNeon(sql as any);
+    const pool = new Pool({ connectionString: cleanNeonUrl(pgUrl) });
+    const adapter = new PrismaNeon(pool as any);
     _client = new PrismaClient({ adapter } as any);
   } else {
     // ── Mode Développement : libsql (SQLite, pure WASM) ──

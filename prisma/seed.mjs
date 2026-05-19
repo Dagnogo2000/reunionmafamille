@@ -29,12 +29,12 @@ let prisma;
 
 if (isPostgres) {
   console.log('📡 Seeding en mode PostgreSQL (Neon)...');
-  const { neon } = await import('@neondatabase/serverless');
+  const { Pool } = await import('@neondatabase/serverless');
   const { PrismaNeon } = await import('@prisma/adapter-neon');
   const pgUrl = cleanString(process.env.POSTGRES_URL_NON_POOLING) || 
                 cleanString(process.env.POSTGRES_URL) || dbUrl;
-  const sql = neon(cleanNeonUrl(pgUrl));
-  const adapter = new PrismaNeon(sql);
+  const pool = new Pool({ connectionString: cleanNeonUrl(pgUrl) });
+  const adapter = new PrismaNeon(pool);
   prisma = new PrismaClient({ adapter });
 } else {
   console.log('💻 Seeding en mode SQLite (libsql)...');
