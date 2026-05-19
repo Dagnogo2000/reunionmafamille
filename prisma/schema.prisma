@@ -1,0 +1,72 @@
+// Pour déployer sur Vercel, utilisez POSTGRES_PRISMA_URL dans prisma.config.ts
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  email     String   @unique
+  password  String
+  role      String   // "admin" ou "membre"
+  photo     String?
+  membreId  Int?     @map("membre_id")
+  membre    Membre?  @relation(fields: [membreId], references: [id])
+}
+
+model Membre {
+  id          Int      @id @default(autoincrement())
+  nom         String
+  role        String   @default("Membre")
+  actif       Int      @default(1)
+  users       User[]
+  presences   Presence[]
+  cotisations Cotisation[]
+}
+
+model Reunion {
+  id        Int      @id @default(autoincrement())
+  titre     String
+  date      String
+  pv        String?
+  presences Presence[]
+}
+
+model Presence {
+  membreId  Int      @map("membre_id")
+  reunionId Int      @map("reunion_id")
+  present   Int      @default(0)
+
+  membre    Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  reunion   Reunion  @relation(fields: [reunionId], references: [id], onDelete: Cascade)
+
+  @@id([membreId, reunionId])
+}
+
+model Cotisation {
+  id           Int      @id @default(autoincrement())
+  membreId     Int      @map("membre_id")
+  montant      Float
+  datePaiement String   @map("date_paiement")
+  note         String?
+
+  membre       Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+}
+
+model Depense {
+  id          Int      @id @default(autoincrement())
+  montant     Float
+  description String
+  dateDepense String   @map("date_depense")
+}
+
+model PhotoGalerie {
+  id        Int      @id @default(autoincrement())
+  titre     String
+  fichier   String
+  createdAt String   @map("created_at")
+}

@@ -1,65 +1,88 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { CalendarDays, Wallet } from 'lucide-react';
+import AppShell from '@/components/AppShell';
+import StatsGrid from '@/components/StatsGrid';
+import PresenceTable from '@/components/PresenceTable';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useAuth } from '@/hooks/useAuth';
+import { api } from '@/lib/api';
+import type { Membre, Stats } from '@/lib/types';
 
 export default function Home() {
+  const router = useRouter();
+  const { isAdmin, loading: authLoading } = useAuth();
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [membres, setMembres] = useState<Membre[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAdmin) {
+      router.replace('/mon-espace');
+      return;
+    }
+    Promise.all([api.getStats(), api.getMembres()])
+      .then(([s, m]) => {
+        if ('mode' in s) return;
+        setStats(s);
+        setMembres(m);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [authLoading, isAdmin, router]);
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <AppShell
+      title="Vue d'ensemble"
+      subtitle="Gestion de l'association familiale"
+    >
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-100">
+          {error}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+      {stats && <StatsGrid stats={stats} />}
+      <PresenceTable membres={membres} />
+
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-5"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.02 }}
+          onClick={() => router.push('/reunions')}
+          className="bg-slate-900 text-white p-6 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.1)] text-left hover:bg-slate-800 transition-colors"
+        >
+          <div className="mb-3 text-slate-300"><CalendarDays size={32} /></div>
+          <p className="font-semibold text-lg">Gérer les réunions</p>
+          <p className="text-sm text-slate-400 mt-1">Planifier et marquer les présences</p>
+        </motion.button>
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.02 }}
+          onClick={() => router.push('/cotisations')}
+          className="bg-white text-slate-900 p-6 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-slate-200 text-left hover:border-slate-300 transition-colors"
+        >
+          <div className="mb-3 text-slate-400"><Wallet size={32} /></div>
+          <p className="font-semibold text-lg">Cotisations et dépenses</p>
+          <p className="text-sm text-slate-500 mt-1">Suivi financier de l'association</p>
+        </motion.button>
+      </motion.div>
+    </AppShell>
   );
 }
