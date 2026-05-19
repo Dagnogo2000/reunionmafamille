@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
 import { randomBytes, scryptSync } from 'crypto';
 
-const dbUrl = process.env.DATABASE_URL ?? process.env.POSTGRES_PRISMA_URL ?? process.env.POSTGRES_URL ?? '';
+const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || '';
 const isPostgres = dbUrl.startsWith('postgres') || dbUrl.startsWith('postgresql') || dbUrl.includes('neon.tech');
 
 let prisma;
@@ -14,7 +14,8 @@ if (isPostgres) {
   console.log('📡 Seeding en mode PostgreSQL (Neon)...');
   const { neon } = await import('@neondatabase/serverless');
   const { PrismaNeon } = await import('@prisma/adapter-neon');
-  const sql = neon(process.env.POSTGRES_URL ?? dbUrl);
+  const pgUrl = process.env.POSTGRES_URL || dbUrl;
+  const sql = neon(pgUrl);
   const adapter = new PrismaNeon(sql);
   prisma = new PrismaClient({ adapter });
 } else {

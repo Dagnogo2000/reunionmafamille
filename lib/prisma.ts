@@ -16,7 +16,7 @@ function getPrisma(): PrismaClient {
   
   let _client: PrismaClient;
 
-  const dbUrl = process.env.DATABASE_URL ?? process.env.POSTGRES_PRISMA_URL ?? process.env.POSTGRES_URL ?? '';
+  const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || '';
   const isPostgres = dbUrl.startsWith('postgres') || dbUrl.startsWith('postgresql') || dbUrl.includes('neon.tech');
 
   if (isPostgres) {
@@ -24,7 +24,8 @@ function getPrisma(): PrismaClient {
     console.log('📡 [Prisma Client] Initialisation en mode PostgreSQL (Neon)...');
     const { neon } = require('@neondatabase/serverless');
     const { PrismaNeon } = require('@prisma/adapter-neon');
-    const sql = neon(process.env.POSTGRES_URL ?? dbUrl);
+    const pgUrl = process.env.POSTGRES_URL || dbUrl;
+    const sql = neon(pgUrl);
     const adapter = new PrismaNeon(sql as any);
     _client = new PrismaClient({ adapter } as any);
   } else {
