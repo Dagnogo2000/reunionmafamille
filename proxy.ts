@@ -6,7 +6,7 @@ import { canAccessRoute, ROUTES_ADMIN_ONLY } from '@/lib/roles';
 const PUBLIC_PAGES = ['/login', '/inscription'];
 const PUBLIC_API = ['/api/auth/login', '/api/auth/signup'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('mafamille_session')?.value;
   const session = token ? await verifyToken(token) : null;
@@ -50,8 +50,6 @@ export async function middleware(request: NextRequest) {
     }
     return NextResponse.next();
   }
-
-
 
   if (!session) {
     const login = new URL('/login', request.url);
