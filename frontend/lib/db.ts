@@ -52,7 +52,7 @@ export const db = {
     
     let payeMois = 0;
     for (const m of membresActifs) {
-      const paid = m.cotisations.filter(c => c.datePaiement.startsWith(month)).reduce((s: number, c: any) => s + c.montant, 0);
+      const paid = m.cotisations.filter((c: any) => c.datePaiement.startsWith(month)).reduce((s: number, c: any) => s + c.montant, 0);
       payeMois += paid;
     }
     
@@ -82,13 +82,13 @@ export const db = {
     const enriched = enrichMembre(m, totalReunions);
     
     const month = currentMonthKey();
-    const paye = m.cotisations.filter(c => c.datePaiement.startsWith(month)).reduce((s: number, c: any) => s + c.montant, 0);
+    const paye = m.cotisations.filter((c: any) => c.datePaiement.startsWith(month)).reduce((s: number, c: any) => s + c.montant, 0);
     const reste = Math.max(0, COTISATION_MENSUELLE - paye);
     
     const mesCotisations = m.cotisations
-      .sort((a, b) => b.datePaiement.localeCompare(a.datePaiement))
+      .sort((a: any, b: any) => b.datePaiement.localeCompare(a.datePaiement))
       .slice(0, 6)
-      .map(c => ({
+      .map((c: any) => ({
         id: c.id,
         membre_id: c.membreId,
         montant: c.montant,
