@@ -1,4 +1,0 @@
-{
-  "buildCommand": "node prisma/prepare-db.mjs && npx prisma db push && (node prisma/seed.mjs || echo 'Seed skipped') && npx prisma generate && next build",
-  "framework": "nextjs"
-}
