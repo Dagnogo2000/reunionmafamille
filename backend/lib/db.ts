@@ -44,15 +44,15 @@ export const db = {
     const cotisations = await prisma.cotisation.findMany();
     const depensesDb = await prisma.depense.findMany();
     
-    const cotisationsPayees = cotisations.reduce((s, c) => s + c.montant, 0);
-    const depenses = depensesDb.reduce((s, d) => s + d.montant, 0);
+    const cotisationsPayees = cotisations.reduce((s: number, c: any) => s + c.montant, 0);
+    const depenses = depensesDb.reduce((s: number, d: any) => s + d.montant, 0);
     
     const attenduMois = membresActifs.length * COTISATION_MENSUELLE;
     const month = currentMonthKey();
     
     let payeMois = 0;
     for (const m of membresActifs) {
-      const paid = m.cotisations.filter(c => c.datePaiement.startsWith(month)).reduce((s, c) => s + c.montant, 0);
+      const paid = m.cotisations.filter(c => c.datePaiement.startsWith(month)).reduce((s: number, c: any) => s + c.montant, 0);
       payeMois += paid;
     }
     
@@ -82,7 +82,7 @@ export const db = {
     const enriched = enrichMembre(m, totalReunions);
     
     const month = currentMonthKey();
-    const paye = m.cotisations.filter(c => c.datePaiement.startsWith(month)).reduce((s, c) => s + c.montant, 0);
+    const paye = m.cotisations.filter(c => c.datePaiement.startsWith(month)).reduce((s: number, c: any) => s + c.montant, 0);
     const reste = Math.max(0, COTISATION_MENSUELLE - paye);
     
     const mesCotisations = m.cotisations
