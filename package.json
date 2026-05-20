@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node prisma/prepare-db.mjs && node prisma/seed.mjs && prisma generate && next build",
+    "build": "node prisma/prepare-db.mjs && npx prisma db push && (node prisma/seed.mjs || echo 'Seed skipped') && npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "node prisma/prepare-db.mjs && prisma generate",
