@@ -21,6 +21,7 @@ try {
   app.use('/api/auth', require('./src/routes/auth'));
   app.use('/api/membres', require('./src/routes/membres'));
   app.use('/api/cotisations', require('./src/routes/cotisations'));
+  app.use('/api/stats', require('./src/routes/stats'));
   console.log('✅ Routes chargées avec succès');
 } catch (error) {
   console.error('❌ Erreur chargement routes:', error.message);
