@@ -53,3 +53,4 @@ replace-db-await.mjs
 
 .vercel
 .env*.local
+frontend/lib/generated/

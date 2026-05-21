@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node -e \"const fs = require('fs'); fs.mkdirSync('prisma', { recursive: true }); fs.copyFileSync('../backend/prisma/schema.prisma', 'prisma/schema.prisma');\" && prisma generate --schema=prisma/schema.prisma && next build"
+    "build": "prisma generate --schema=../backend/prisma/schema.prisma && next build"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",
