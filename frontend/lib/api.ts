@@ -1,6 +1,8 @@
 import type { MembreStats, Stats, User } from './types';
 
-const API_BASE = '/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL 
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api`
+  : '/api';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -44,7 +46,7 @@ export const api = {
     }),
 
   updateProfile: (formData: FormData) =>
-    fetch('/api/users/me', {
+    fetch(`${API_BASE}/users/me`, {
       method: 'PUT',
       body: formData,
       credentials: 'include',
@@ -71,28 +73,35 @@ export const api = {
   me: () => request<{ user: User }>('/auth/me'),
 
   getStats: () => request<Stats | ({ mode: 'membre' } & MembreStats)>('/stats'),
+  
   getMembres: () => request<import('./types').Membre[]>('/membres'),
+  
   addMembre: (data: { nom: string; role: string }) =>
     request<import('./types').Membre>('/membres', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+    
   updateMembre: (data: { id: number; nom: string; role: string; actif: number }) =>
     request<import('./types').Membre>('/membres', {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+    
   deleteMembre: (id: number) =>
-    request<{ success: boolean }>(`/membres?id=${id}`, { method: 'DELETE' }),
+    request<{ success: boolean }>(`/membres/${id}`, { method: 'DELETE' }),
 
   getReunions: () => request<import('./types').Reunion[]>('/reunions'),
+  
   addReunion: (data: { titre: string; date: string }) =>
     request<import('./types').Reunion>('/reunions', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+    
   deleteReunion: (id: number) =>
-    request<{ success: boolean }>(`/reunions?id=${id}`, { method: 'DELETE' }),
+    request<{ success: boolean }>(`/reunions/${id}`, { method: 'DELETE' }),
+    
   updateReunionPv: (id: number, file?: File, text?: string) => {
     const formData = new FormData();
     formData.append('id', String(id));
@@ -101,13 +110,13 @@ export const api = {
     } else if (text !== undefined) {
       formData.append('pv', text);
     }
-    return fetch('/api/reunions', {
+    return fetch(`${API_BASE}/reunions`, {
       method: 'PUT',
       body: formData,
       credentials: 'include',
     }).then(async (res) => {
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : null;
+      const responseText = await res.text();
+      const data = responseText ? JSON.parse(responseText) : null;
       if (!res.ok) throw new Error(data?.error || `Erreur ${res.status}`);
       return data as import('./types').Reunion;
     });
@@ -115,6 +124,7 @@ export const api = {
 
   getPresences: (reunionId: number) =>
     request<import('./types').Presence[]>(`/presences?reunion_id=${reunionId}`),
+    
   setPresence: (data: { membre_id: number; reunion_id: number; present: number }) =>
     request<{ success: boolean }>('/presences', {
       method: 'POST',
@@ -122,6 +132,7 @@ export const api = {
     }),
 
   getCotisations: () => request<import('./types').Cotisation[]>('/cotisations'),
+  
   addCotisation: (data: {
     membre_id: number;
     montant: number;
@@ -132,19 +143,23 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+    
   deleteCotisation: (id: number) =>
-    request<{ success: boolean }>(`/cotisations?id=${id}`, { method: 'DELETE' }),
+    request<{ success: boolean }>(`/cotisations/${id}`, { method: 'DELETE' }),
 
   getDepenses: () => request<import('./types').Depense[]>('/depenses'),
+  
   addDepense: (data: { montant: number; description: string; date_depense: string }) =>
     request<import('./types').Depense>('/depenses', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+    
   deleteDepense: (id: number) =>
-    request<{ success: boolean }>(`/depenses?id=${id}`, { method: 'DELETE' }),
+    request<{ success: boolean }>(`/depenses/${id}`, { method: 'DELETE' }),
 
   getGalerie: () => request<import('./types').PhotoGalerie[]>('/galerie'),
+  
   uploadPhoto: (formData: FormData) =>
     fetch(`${API_BASE}/galerie`, {
       method: 'POST',
@@ -156,8 +171,9 @@ export const api = {
       if (!res.ok) throw new Error(data?.error || `Erreur ${res.status}`);
       return data as import('./types').PhotoGalerie;
     }),
+    
   deletePhoto: (id: number) =>
-    request<{ success: boolean }>(`/galerie?id=${id}`, { method: 'DELETE' }),
+    request<{ success: boolean }>(`/galerie/${id}`, { method: 'DELETE' }),
 };
 
 export function formatFcfa(amount: number): string {
