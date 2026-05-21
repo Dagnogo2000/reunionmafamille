@@ -3,10 +3,10 @@
   "private": true,
   "scripts": {
     "preinstall": "npm i @prisma/client",
+    "postinstall": "prisma generate --schema=../backend/prisma/schema.prisma",
     "dev": "next dev",
     "prepare": "prisma generate --schema=../backend/prisma/schema.prisma",
-    "build": "npm run prepare && next build",
-    "postinstall": "prisma generate --schema=../backend/prisma/schema.prisma"
+    "build": "npm i @prisma/client && prisma generate --schema=../backend/prisma/schema.prisma && next build"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",
