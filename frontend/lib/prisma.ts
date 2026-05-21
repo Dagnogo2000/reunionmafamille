@@ -1,7 +1,7 @@
 // lib/prisma.ts
 // La connexion est LAZY : elle n'est créée qu'à la première requête, pas au build.
 
-import { PrismaClient } from './generated/client';
+import { PrismaClient } from '@prisma/client';
 
 declare global {
   // eslint-disable-next-line no-var
