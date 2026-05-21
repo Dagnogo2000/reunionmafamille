@@ -1,6 +1,6 @@
-// Pour déployer sur Vercel, utilisez POSTGRES_PRISMA_URL dans prisma.config.ts
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -12,7 +12,7 @@ model User {
   nom       String
   email     String   @unique
   password  String
-  role      String   // "admin" ou "membre"
+  role      String   
   photo     String?
   membreId  Int?     @map("membre_id")
   membre    Membre?  @relation(fields: [membreId], references: [id])
@@ -40,10 +40,8 @@ model Presence {
   membreId  Int      @map("membre_id")
   reunionId Int      @map("reunion_id")
   present   Int      @default(0)
-
   membre    Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
   reunion   Reunion  @relation(fields: [reunionId], references: [id], onDelete: Cascade)
-
   @@id([membreId, reunionId])
 }
 
@@ -53,7 +51,6 @@ model Cotisation {
   montant      Float
   datePaiement String   @map("date_paiement")
   note         String?
-
   membre       Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
 }
 
