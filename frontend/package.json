@@ -2,8 +2,10 @@
   "name": "famille-frontend",
   "private": true,
   "scripts": {
+    "preinstall": "npm i @prisma/client",
     "dev": "next dev",
-    "build": "next build",
+    "prepare": "prisma generate --schema=../backend/prisma/schema.prisma",
+    "build": "npm run prepare && next build",
     "postinstall": "prisma generate --schema=../backend/prisma/schema.prisma"
   },
   "dependencies": {
@@ -12,6 +14,7 @@
     "@prisma/adapter-libsql": "^7.8.0",
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "prisma": "^7.8.0",
     "@vercel/blob": "^2.4.0",
     "next": "16.2.6",
     "react": "19.2.4",
@@ -27,7 +30,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
-    "prisma": "^7.8.0",
+
     "tailwindcss": "^4",
     "typescript": "^5"
   }

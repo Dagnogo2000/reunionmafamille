@@ -58,8 +58,8 @@ export const db = {
     
     const impayes = Math.max(0, attenduMois - payeMois);
     const alertes = membresActifs
-      .map((m) => enrichMembre(m, totalReunions))
-      .filter((m) => m.alerteAbsences);
+      .map((m: any) => enrichMembre(m, totalReunions))
+      .filter((m: any) => m.alerteAbsences);
       
     return {
       membresActifs: membresActifs.length,
