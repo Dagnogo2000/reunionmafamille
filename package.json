@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "install": "npm install --prefix frontend && npm install --prefix backend",
+    "install": "npm install --prefix frontend",
     "build": "npm run build --prefix frontend"
   }
 }
